@@ -1,0 +1,28 @@
+function percol_select_history() {
+  local tac_cmd
+  which gtac &> /dev/null && tac_cmd=gtac || tac_cmd=tac
+  BUFFER=$($tac_cmd ~/.zhistory | sed 's/^: [0-9]*:[0-9]*;//' \
+    | percol --match-method regex --query "$LBUFFER")
+  CURSOR=$#BUFFER         # move cursor
+  zle -R -c               # refresh
+}
+zle -N percol_select_history
+bindkey '^R' percol_select_history
+
+function percol_getpass() {
+  PASS_ENVI=$(cat ~/Documents/issapd/gio-stand.txt |grep -v "^$"|awk -F ':' '{print $1}'|percol)
+  ENVI=`echo $PASS_ENVI |awk '{print $1}'`
+  USER=`echo $PASS_ENVI |awk '{print $2}'`
+  sh ~/bin/getpass $ENVI $USER
+  zle -R -c               # refresh
+}
+zle -N percol_getpass
+bindkey '^Q' percol_getpass
+
+function percol-ssh() {
+  rm -f ~/.ssh/config
+  cat ~/.ssh/config.d/* > ~/.ssh/config
+  SSH=$(grep "^\s*Host " ~/.ssh/config | sed s/"[\s ]*Host "// | grep -v "^\*$" | sort | percol)
+  ssh $SSH
+}
+alias ss="percol-ssh"

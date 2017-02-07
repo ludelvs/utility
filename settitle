@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ t="[$@]"
+ # "\e]2;" > control code to start changing the window title
+ # "\007"  > control code to end
+ echo -ne "\e]2;$t\007"

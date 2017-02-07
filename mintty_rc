@@ -1,0 +1,1 @@
+settitle $(($(ps -ef |grep mintty |wc -l) - 1))
