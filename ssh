@@ -1,0 +1,38 @@
+#!/bin/bash
+
+LIMIT=10
+CNT=0
+LOCK_FILE=/tmp/.ssh.lock
+
+while [ -d "${LOCK_FILE}" ]
+do
+  sleep 0.1
+  if [ $CNT -eq $LIMIT ]; then
+    echo "${LOCK_FILE} exist. please delete."
+    exit 1
+  fi
+  CNT=$((CNT+1))
+done
+
+mkdir ${LOCK_FILE}
+
+CONNECT_HOSTNAME=${1}
+if [ -n "${2}" ]; then
+  if [ "${2}" = "1" ]; then
+    MULTI_SSH_FLAG=${2}
+  fi
+fi
+
+if [ ! "${MULTI_SSH_FLAG}" -a "`ps -ef |grep tmux`" ]; then
+  tmux rename-window ${CONNECT_HOSTNAME}
+  tmux pipe-pane
+
+  tmux pipe-pane -o '/bin/sh -c "tmux_logging.sh ~/.tmux/log #S #I #P #W"'
+fi
+
+cat ~/.ssh/config.d/* > ~/.ssh/config.new
+mv ~/.ssh/config.new ~/.ssh/config
+
+rmdir ${LOCK_FILE}
+
+/usr/bin/ssh $*
