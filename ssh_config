@@ -1,0 +1,29 @@
+Host conoha_maisp-web
+  HostName 192.168.56.9
+  User sysadmin
+  Port 22
+  ServerAliveInterval 60
+  ProxyCommand /usr/bin/ssh -W %h:%p conoha
+  IdentityFile ~/.ssh/id_rsa.my2
+  StrictHostKeyChecking no
+
+Host gitbucket
+  Hostname gitbucket.effect.ga
+  User git
+  Port 29418
+  ServerAliveInterval 60
+  ProxyCommand /usr/bin/ssh -W %h:%p conoha_step
+  IdentityFile ~/.ssh/id_rsa
+
+Host conoha_step
+  Hostname 163.44.174.156
+  User root
+  Port 443
+  ServerAliveInterval 60
+  ProxyCommand /usr/bin/corkscrew proxy.example.com 8080 %h %p
+  UserKnownHostsFile /dev/null
+  StrictHostKeyChecking no
+  PasswordAuthentication no
+  IdentitiesOnly yes
+  LogLevel FATAL
+  IdentityFile ~/.ssh/id_rsa_conoha
